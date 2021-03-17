@@ -16,10 +16,12 @@ var (
 	apiRouter = router.PathPrefix("/v1").Subrouter()
 )
 
+// apiRoutes is a collection of API routes
 func apiRoutes(ctx context.Context) {
-	apiRouter.HandleFunc("/weather", api.HandleWeather).Methods("GET")
+	apiRouter.Handle("/weather", cached("3s", true, api.HandleWeather)).Methods("GET")
 }
 
+// webRoutes is a collection of web routes
 func webRoutes(ctx context.Context) {
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))

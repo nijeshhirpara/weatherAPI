@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// SendJsonResponse converts interface into json and writes an output with json header
 func SendJsonResponse(w http.ResponseWriter, res interface{}) {
 	jsonContent, jsonError := json.MarshalIndent(res, "", "	")
 	if jsonError != nil {
@@ -17,6 +18,7 @@ func SendJsonResponse(w http.ResponseWriter, res interface{}) {
 	w.Write(jsonContent)
 }
 
+// Response is a reference for sending output
 type Response struct {
 	Status string      `json:"status"`
 	Data   interface{} `json:"data"`

@@ -4,12 +4,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"weatherapi/cache"
+	"weatherapi/webserver/services"
 
 	"github.com/gorilla/handlers"
 	"golang.org/x/net/context"
 )
 
+// Start is responsible to initalize cache storage, register routes and start the server
 func Start() error {
+	services.Storage = cache.NewStorage()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

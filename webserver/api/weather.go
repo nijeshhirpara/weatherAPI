@@ -8,6 +8,9 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"time"
+
+	"weatherapi/webserver/services"
 
 	"github.com/stretchr/objx"
 )
@@ -16,6 +19,8 @@ type weatherData struct {
 	WindSpeed   float64 `json:"wind_speed"`
 	Temperature float64 `json:"temperature_degrees"`
 }
+
+var client http.Client
 
 func HandleWeather(w http.ResponseWriter, r *http.Request) {
 	var content Response
@@ -34,6 +39,11 @@ func HandleWeather(w http.ResponseWriter, r *http.Request) {
 	var wd weatherData
 	var err error
 
+	client = http.Client{
+		Timeout: 3 * time.Second,
+	}
+
+	// Primary source
 	wd, err = fetchFromWeatherStack(city[0])
 	if err == nil {
 		content.Data = wd
@@ -43,6 +53,7 @@ func HandleWeather(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(err)
 
+	// Secondary Source
 	wd, err = fetchFromOpenWeatherMap(city[0])
 	if err == nil {
 		content.Data = wd
@@ -51,6 +62,15 @@ func HandleWeather(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println(err)
+
+	// Cached response
+	cachedContent := services.Storage.Get(r.RequestURI, true)
+	if cachedContent != nil {
+		fmt.Print("Cache Hit!\n")
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Write(cachedContent)
+		return
+	}
 
 	content.Status = "error"
 	SendJsonResponse(w, content)
@@ -62,7 +82,7 @@ func fetchFromWeatherStack(city string) (weatherData, error) {
 
 	accessKey := os.Getenv("WeatherStack_Access_Key")
 	url := fmt.Sprintf("http://api.weatherstack.com/current?access_key=%s&query=%s", accessKey, city)
-	res, err := http.Get(url)
+	res, err := client.Get(url)
 	if err != nil {
 		return wd, err
 	}
@@ -100,7 +120,7 @@ func fetchFromOpenWeatherMap(city string) (weatherData, error) {
 
 	accessKey := os.Getenv("OpenWeatherMap_AppID")
 	url := fmt.Sprintf("http://api.openweathermap.org/data/2.5/weather?appid=%s&q=%s", accessKey, city)
-	res, err := http.Get(url)
+	res, err := client.Get(url)
 	if err != nil {
 		return wd, err
 	}

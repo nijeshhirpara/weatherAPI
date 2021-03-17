@@ -16,6 +16,7 @@ func main() {
 	}
 
 	log.Println("Trying to start server")
+
 	webErr := webserver.Start()
 	if webErr != nil {
 		log.Fatal("Server cannot be able to start", webErr)
