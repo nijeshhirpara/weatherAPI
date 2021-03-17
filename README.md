@@ -20,6 +20,8 @@ WeatherAPI is an HTTP Service that reports on Melbourne weather. This service wi
 
 ## Development Environment
 
+* Copy .env.sample to .env. 
+* Enter WeatherStack_Access_Key and OpenWeatherMap_AppID.
 
 ### build
 
