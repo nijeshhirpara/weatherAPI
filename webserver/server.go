@@ -1,7 +1,7 @@
 package webserver
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -18,10 +18,10 @@ func Start() error {
 
 	http.Handle("/", router)
 
-	fmt.Println("Webserver is started on :8081")
+	log.Println("Webserver is started on :8081")
 	httpErr := http.ListenAndServe(":8081", handlers.LoggingHandler(os.Stdout, router))
 	if httpErr != nil {
-		fmt.Println("Could not initialise HTTP listener:", httpErr)
+		log.Fatal("Could not initialise HTTP listener:", httpErr)
 		return httpErr
 	}
 

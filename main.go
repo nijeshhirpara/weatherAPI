@@ -1,16 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"weatherapi/webserver"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	fmt.Println("Trying to start server")
+	// load .env file
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	log.Println("Trying to start server")
 	webErr := webserver.Start()
 	if webErr != nil {
-		fmt.Println("Server cannot be able to start", webErr)
-		log.Fatal(webErr)
+		log.Fatal("Server cannot be able to start", webErr)
 	}
 }
