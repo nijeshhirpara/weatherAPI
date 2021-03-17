@@ -23,8 +23,10 @@ func Start() error {
 
 	http.Handle("/", router)
 
-	log.Println("Webserver is started on :8081")
-	httpErr := http.ListenAndServe(":8081", handlers.LoggingHandler(os.Stdout, router))
+	port := os.Getenv("PORT")
+
+	log.Println("Webserver is started on :" + port)
+	httpErr := http.ListenAndServe(":"+port, handlers.LoggingHandler(os.Stdout, router))
 	if httpErr != nil {
 		log.Fatal("Could not initialise HTTP listener:", httpErr)
 		return httpErr
